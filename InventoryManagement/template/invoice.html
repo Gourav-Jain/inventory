@@ -1,0 +1,438 @@
+{%extends 'template/index.html'%}
+
+{% block content %}
+
+
+<div class="container-fluid">
+	<div class="row">
+	<div class="navbar-header">
+		<button type="button" class="navbar-toggle">
+			<span class="sr-only">Toggle navigation</span> <span
+				class="icon-bar bar1"></span> <span class="icon-bar bar2"></span> <span
+				class="icon-bar bar3"></span>
+		</button>
+		<a class="navbar-brand" href="#">Add New Tax Invoice</a>
+	</div>
+	</div>
+	<div class="row">		
+	<form method="post" target="_blank" action="{% url 'invoicep' %}">
+	{% csrf_token %}
+	{{form}}
+		<div class="row clientinfo">
+			<label for="clients" class="col-sm-2 col-form-label" >Client Name</label> 
+			<div class="col-sm-5">
+				<select class="form-control" id="clients" name="clients" onchange="OnClientChange()">
+					<option value="0" selected>Select Client</option>
+					{% for cl in clients %}
+					<option value={{cl.id}}>{{cl.name}}</option>
+					{% endfor %}
+				</select>
+				<input type="hidden" name="clientname" >
+			</div>			
+		</div>
+		
+		<div class="form-inline row invoicenfo">
+			<div></div>
+			<div class="col-sm-2">
+				<label for="invoiceno" class="mr-sm-2" >Invoice no</label>
+			</div>
+			<div class="col-sm-2">
+				<input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="invoiceno" name="invoiceno" value={{innumber}} />
+			</div>
+			<div class="col-sm-2">
+				<label for="invoicedate" class="mr-sm-2" >Invoice Date</label>
+			</div>
+			<div class="col-sm-2">
+				<input class="form-control input-sm" id="invoicedate" name="invoicedate" /><!-- <span><i class="ti-calendar"></i></span> -->
+			</div>
+			<div class="col-sm-2">			
+				<label for="duedate" class="mr-sm-2" >Due Date</label>
+			</div>
+			<div class="col-sm-2">
+				<input class="form-control input-sm" id="duedate" name="duedate" />
+			</div>			
+		</div>
+		
+		<div class="form-inline row invoicenfo">
+			<div class="col-sm-2">
+				<label for="pono" class="mr-sm-2" >PO no</label>
+			</div>
+			<div class="col-sm-2">
+				<input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" id="pono"  name="pono"/>
+			</div>
+			
+			<div class="col-sm-2">
+			<label for="paymentterm" class="mr-sm-2" >Payment Terms</label>
+			</div>
+			<div class="col-sm-2">
+			<select class="form-control mb-2 mr-sm-2 mb-sm-0" id="paymentterm" name="paymentterm"> 
+				<option value="">Select Payment Term</option>
+				<option value="Cash">Cash</option>
+				<option value="CCDC">Credit Card</option>
+				<option value="NB">Net Banking</option>
+			</select>
+			</div>			
+		</div>
+		<div class="row" style="border-top: 1px solid #e5e5e5;padding: 5px;">
+			<div class="col-sm-5">
+				<h4>Invoice</h4>
+			</div>
+			<div class="col-sm-2">
+				
+			</div>
+			<div class="col-sm-5" style="text-align: right">
+				<button class="btn btn-primary" id="addrow">Add Item</button>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-12">
+			<table class="table" id="itemlist" style="border-bottom: 1px solid #e5e5e5">
+				<thead>
+				<tr style="background-color: #e9eef1">
+					<th>No</th>
+					<th>Item Name</th>
+					<th >HSN</th>
+					<th>Unit</th>
+					<th>QTY</th>
+					<th>Price</th>
+					<th>Discount(%)</th>
+					<th>GST(%)</th>
+					<th>Total</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr id="item_rw_1">
+					<td>
+						<span id="itemno">1</span>
+					</td>
+					<td>
+						<select id="item_name_1" name="itemname" class="form-control tblItemselect" onchange="OnItemChange(this.id)" required>
+							<option value="" selected>Select item</option>
+							{% for prod in products %}
+							<option value={{prod.id}}>{{prod.name}}</option>							
+							{% endfor %}
+						</select>
+						<input type="hidden" id="hdn_item_name_1" name="hdnitemname" >
+					</td>
+					<td>
+						<input type="text" id="item_hsn_1" name="hsn" placeholder="HSN" class="form-control tblinput"/>
+					</td>
+					
+					<td><input type="text" id="item_unit_1" name="unit" placeholder="Unit" class="form-control tblinput"/></td>
+					<td><input type="number" min="1" id="item_qty_1" name="qty" placeholder="Qty" class="form-control tblinput" onchange="OnQtyChange(this.id)"/></td>
+					<td><input type="number" step="0.00" id="item_price_1" name="price" placeholder="Price" class="form-control tblDiscInput" onchange="OnPriceChange(this.id);" required /></td>
+					
+					<td><input type="number" id="item_disc_1" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/></td>
+					<td>
+						<select name="gst" id="item_gst_1" name="gst" class="form-control tblGSTselect" onchange="OnGSTChange(this.id)">
+							<option selected>Select GST</option>
+							<option value="5" >5%</option>
+							<option value="12" >12%</option>
+							<option value="16" >16%</option>
+							<option value="20" >20%</option>
+						</select>
+					</td>
+					<td align="right">
+						&#8377;&nbsp;<label for="itemtotal"  id="lbl_item_total_1">0</label>	
+						<input type="hidden" id="item_total_1" name="itemtotal" value="0">					
+					</td>
+				</tr>
+				</tbody>
+			</table>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="col-sm-5"></div>
+			<div class="col-sm-2"></div>
+			<div class="col-sm-5">
+				<table class="table borderless">
+					<tr>
+						<td><label>Sub Total:</label></td>
+						<td style="text-align:right;">
+						&#8377;&nbsp;<label id="subtotal">0</label>
+						<input type="hidden"  name="subtotal">
+						</td>
+					</tr>
+					<tr>
+						<td><label>CGST:</label></td>
+						<td style="text-align:right;">&#8377;&nbsp;<label id="ctaxtotal">0</label></td>
+					</tr>
+					<tr>
+						<td><label>SGST:</label></td>
+						<td style="text-align:right;">&#8377;&nbsp;<label id="staxtotal">0</label></td>
+					</tr>
+					<tr>
+						<td><label>IGST:</label></td>
+						<td style="text-align:right;">
+						&#8377;&nbsp;<label id="taxtotal">0</label>
+						<input type="hidden" name="taxtotal" value="0">
+						</td>
+					</tr>
+					<tr>
+						<td><label>Discount:</label></td>
+						<td style="text-align:right;">
+						&#8377;&nbsp;<label id="disctotal" >0</label>
+						<input type="hidden" name="disctotal" value="0">
+						</td>
+					</tr>
+					<tr style="background-color: #f9fafb;border:1px solid #e5e5e5">
+						<td><label class="text-success">Total:</label></td>
+						<td style="text-align:right;">
+						&#8377;&nbsp;<label id="total">0</label>
+						<input type="hidden"  name="total" value="0">
+						</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	
+</div>		
+</div>
+<div class="row footer">
+	<input class="btn btn-success btn-action" type="submit" value="Save & Print" />
+</div>
+</form>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	$("#invoicedate").datepicker("setDate", new Date());
+	$('#invoicedate').datepicker({
+	    setDate: new Date(),
+	    autoclose:true,
+	});
+$('#duedate').datepicker({
+	    
+});	
+});
+
+
+$("#addrow").click(function(){		
+	var iname,iprice;
+	iname = $('#itemlist tr:last select.tblItemselect').val();
+	iprice = $('#itemlist tr:last input[name=price]').val();
+	
+	if(iname != "" && iprice != ""){
+		
+		var thizz = document.getElementById('itemno');
+		var id = $(thizz).closest('table').find('tr:last td:first').text();
+		var newid = parseInt(id)+1;
+	    $("#itemlist").append('<tr id="item_rw_'+newid+'"><td>'+newid+'</td>'+
+			'<td><select id="item_name_'+newid+'" name="itemname" class="form-control tblItemselect" onchange="OnItemChange(this.id)" required><option value="" selected>Select item</option>'+ 
+			{% for prod in products%}
+			'<option value={{prod.id}}>{{prod.name}}</option>'+						
+			{% endfor %}
+			+'</select>'+
+			'<input type="hidden" name="hdnitemname" id="hdn_item_name_'+newid+ '" ></td>'+
+			'<td><input type="text" id="item_hsn_'+newid+'" name="hsn" placeholder="HSN" class="form-control tblinput"/></td>'+			
+			'<td><input type="text" id="item_unit_'+newid+'" name="unit" placeholder="Unit" class="form-control tblinput"/></td>'+
+			'<td><input type="number" id="item_qty_'+newid+'" name="qty" placeholder="Qty" class="form-control tblinput" onchange="OnQtyChange(this.id)"/></td>'+
+			'<td><input type="number" id="item_price_'+newid+'" name="price" placeholder="Price" class="form-control tblDiscInput" required="required" onchange="OnPriceChange(this.id)"/></td>'+
+			
+			'<td><input type="number" id="item_disc_'+newid+'" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/></td>'+
+			'<td><select id="item_gst_'+newid+'" name="gst" class="form-control tblGSTselect" onchange="OnGSTChange(this.id)"><option selected>Select GST</option><option value="5" >5%</option><option value="12" >12%</option><option value="16" >16%</option><option value="20" >20%</option></select></td>'+
+			'<td align="right">&#8377;&nbsp;<label for="itemtotal" id="lbl_item_total_'+newid+'">0</label><input  type="hidden" id="item_total_'+newid+'" name="itemtotal" value="0"></td>');
+	}
+ });
+
+
+/* Global Variable 
+ * currentId: Current selected item in table
+ * price: Current selected item  price in table
+ * qty: Current selected item  qty in table
+ * disc: Current selected item  disc in table
+ * gst: Current selected item  gst in table
+ */
+var currentId = 0;
+var crtrlQtyId="#item_qty_";
+var crtrlPriceId="#item_price_";
+var crtrlDiscId="#item_disc_";
+var crtrlGstId="#item_gst_";
+var crtrlItemtId="#lbl_item_total_";
+var crtrlItemtName="#item_name_";
+var totaltax =0, totaldiscount =0;
+
+function getCurrentId(data){
+	if (data != ""){
+		var ctrlid = data;
+		var getid = ctrlid.substr(ctrlid.lastIndexOf('_')+1, ctrlid.length);
+		return getid;
+	}
+}
+function OnItemChange(data){
+	currentId = getCurrentId(data);
+	if(currentId > 0){
+		
+		var username = $(crtrlItemtName+currentId ).val();
+		$("#hdn_item_name_"+currentId).val($(crtrlItemtName+currentId+" :selected" ).text());
+
+	      $.ajax({
+	        url: '{%url "get_item_details" %}',
+	        data: {
+	          'itemid': username
+	        },
+	        dataType: 'json',
+	        success: function (data) {
+	          if (data.price) {
+	            $(crtrlPriceId+currentId).val(data.price);
+	            $(crtrlQtyId+currentId).val(1);
+	            
+	            update_item_total();
+	    		update_total();
+	          }
+	        }
+	      });
+	}
+}
+function OnClientChange(){
+	var selectedClient = $("#clients :selected").text()
+	$("input[name=clientname]").val(selectedClient);
+}
+function OnPriceChange(data){	
+	currentId = getCurrentId(data);
+	if(currentId > 0){
+		update_item_total();
+		update_total();
+	}
+}
+
+function OnQtyChange(data){
+	currentId = getCurrentId(data);
+	if(currentId > 0){
+		update_item_total();
+		update_total();
+	}
+}
+
+function OnDiscChange(data){
+	currentId = getCurrentId(data);
+	var disc = parseInt($("#"+data).val());
+	if(disc > 100){
+		alert("it's not percentage");
+		
+	}else{
+		if(currentId > 0){
+			update_item_total();
+			update_total();
+		}
+	}
+}
+
+function OnGSTChange(data){
+	currentId = getCurrentId(data);
+	if(currentId > 0){
+		update_item_total();
+		update_total();
+	}
+}
+
+function update_item_total(){
+	
+	var price = parseInt($(crtrlPriceId + currentId).val());	
+	var qty = parseInt($(crtrlQtyId + currentId).val());
+	var disc = parseInt($(crtrlDiscId + currentId).val());
+	var gst = parseInt($(crtrlGstId + currentId).val());
+	
+	if(qty > 1){
+		price = (price * qty); 
+	}
+	
+	var discamount,afterdiscamount,addtaxinprice,tax;
+	if(disc > 0 && disc <= 100){
+		discamount = ((price * disc) / 100);
+		totaldiscount += discamount;
+		afterdiscamount = (price - discamount);
+	}else{
+		afterdiscamount = price; 
+	}
+	
+	if (gst > 0) {
+		tax = (afterdiscamount * gst / 100);
+		totaltax +=tax;
+		addtaxinprice = (afterdiscamount + tax); 
+	}else{
+		addtaxinprice = afterdiscamount;
+	}
+	if(!isNaN(addtaxinprice)){
+		$(crtrlItemtId + currentId).text(roundNumber(addtaxinprice,2));
+		$("#item_total_"+currentId).val(roundNumber(addtaxinprice,2)); 
+	}
+}
+function update_total(){
+	var total = 0;
+	$("#itemlist > tbody > tr").each(function(){
+		total += parseInt($(this).closest('tr').find("label[for=itemtotal]").text());
+	})
+	if(!isNaN(total)){
+		$("#total").text(roundNumber(total,2));
+		$("input[name=total]").val(roundNumber(total,2));
+	}
+	
+	update_subtotal();
+}
+function update_subtotal(){
+	var total = 0;
+	$("#itemlist > tbody > tr").each(function(){
+		total += parseInt($(this).closest('tr').find("input[name=price]").val());
+	})
+	if(!isNaN(total)){
+		$("#subtotal").text(roundNumber(total, 2));
+		$("input[name=subtotal]").val(roundNumber(total,2));
+	}
+	if(!isNaN(totaltax) && totaltax!=0){
+		$("#taxtotal").text(roundNumber(totaltax,2));
+		$("input[name=taxtotal]").val(roundNumber(totaltax,2));
+	}
+	if(!isNaN(totaldiscount) && totaldiscount!=0){
+		$("#disctotal").text(roundNumber(totaldiscount,2));
+		$("input[name=disctotal]").val(roundNumber(totaldiscount,2));
+	}
+}
+
+//from http://www.mediacollege.com/internet/javascript/number/round.html
+function roundNumber(number,decimals) {
+  var newString;// The new rounded number
+  decimals = Number(decimals);
+  if (decimals < 1) {
+    newString = (Math.round(number)).toString();
+  } else {
+    var numString = number.toString();
+    if (numString.lastIndexOf(".") == -1) {// If there is no decimal point
+      numString += ".";// give it one at the end
+    }
+    var cutoff = numString.lastIndexOf(".") + decimals;// The point at which to truncate the number
+    var d1 = Number(numString.substring(cutoff,cutoff+1));// The value of the last decimal place that we'll end up with
+    var d2 = Number(numString.substring(cutoff+1,cutoff+2));// The next decimal, after the last one we want
+    if (d2 >= 5) {// Do we need to round up at all? If not, the string will just be truncated
+      if (d1 == 9 && cutoff > 0) {// If the last digit is 9, find a new cutoff point
+        while (cutoff > 0 && (d1 == 9 || isNaN(d1))) {
+          if (d1 != ".") {
+            cutoff -= 1;
+            d1 = Number(numString.substring(cutoff,cutoff+1));
+          } else {
+            cutoff -= 1;
+          }
+        }
+      }
+      d1 += 1;
+    } 
+    if (d1 == 10) {
+      numString = numString.substring(0, numString.lastIndexOf("."));
+      var roundedNum = Number(numString) + 1;
+      newString = roundedNum.toString() + '.';
+    } else {
+      newString = numString.substring(0,cutoff) + d1.toString();
+    }
+  }
+  if (newString.lastIndexOf(".") == -1) {// Do this again, to the new string
+    newString += ".";
+  }
+  var decs = (newString.substring(newString.lastIndexOf(".")+1)).length;
+  for(var i=0;i<decimals-decs;i++) newString += "0";
+  //var newNumber = Number(newString);// make it a number if you like
+  return newString; // Output the result to the form field (change for your purposes)
+}
+</script>
+
+
+{% endblock %}
