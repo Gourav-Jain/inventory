@@ -1,8 +1,8 @@
 from django import forms
 
 class InvoiceForm(forms.Form):
-    clients = forms.CharField(max_length=255, required=False)
-    clientname = forms.CharField(max_length=255,required=False)
+    clients = forms.CharField(max_length=255)
+    clientname = forms.CharField(max_length=255)
     invoiceno = forms.CharField(max_length=255,required=False)
     invoicedate = forms.CharField(max_length=255, required=False)
     duedate = forms.CharField(max_length=255, required=False)
@@ -18,6 +18,8 @@ class InvoiceForm(forms.Form):
     itemtotal = forms.CharField(max_length=255,required=False)
     subtotal = forms.CharField(max_length=255,required=False)
     taxtotal = forms.CharField(max_length=255,required=False)
+    ctaxtotal = forms.CharField(max_length=255,required=False)
+    staxtotal = forms.CharField(max_length=255,required=False)
     disctotal = forms.CharField(max_length=255,required=False)
     total = forms.CharField(max_length=255,required=False)
 
@@ -25,8 +27,8 @@ class InvoiceForm(forms.Form):
 class ClientsForm(forms.Form):
     clientname = forms.CharField()
     billto = forms.CharField()
-    shipto = forms.CharField(required=False)
-    issame =  forms.BooleanField()
+#     shipto = forms.CharField(required=False)
+#     issame =  forms.BooleanField()
     email = forms.EmailField()
     contactnum = forms.CharField()
     
@@ -35,5 +37,5 @@ class ProductsForm(forms.Form):
     tax = forms.IntegerField()
     unit = forms.CharField()
     hsn = forms.CharField()
-    price = forms.DecimalField()
+    price = forms.IntegerField()
     

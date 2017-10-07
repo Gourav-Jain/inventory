@@ -21,13 +21,18 @@
 		<div class="row clientinfo">
 			<label for="clients" class="col-sm-2 col-form-label" >Client Name</label> 
 			<div class="col-sm-5">
-				<select class="form-control" id="clients" name="clients" onchange="OnClientChange()">
+				<select class="form-control" id="clients" name="clients" onchange="OnClientChange()" required>
 					<option value="0" selected>Select Client</option>
 					{% for cl in clients %}
-					<option value={{cl.id}}>{{cl.name}}</option>
+					<option value={{cl.id}}>{{cl.name}}, {{cl.billing_address}}</option>
 					{% endfor %}
 				</select>
 				<input type="hidden" name="clientname" >
+				<input type="hidden" name="clientadd" >
+				
+			</div>
+			<div class="col-sm-5">
+			<span id="clientadds"></span>
 			</div>			
 		</div>
 		
@@ -118,19 +123,22 @@
 						<input type="text" id="item_hsn_1" name="hsn" placeholder="HSN" class="form-control tblinput"/>
 					</td>
 					
-					<td><input type="text" id="item_unit_1" name="unit" placeholder="Unit" class="form-control tblinput"/></td>
+					<td><input type="text" id="item_unit_1" name="unit" placeholder="Unit" class="form-control tblinput" value="sqft"/></td>
 					<td><input type="number" min="1" id="item_qty_1" name="qty" placeholder="Qty" class="form-control tblinput" onchange="OnQtyChange(this.id)"/></td>
 					<td><input type="number" step="0.00" id="item_price_1" name="price" placeholder="Price" class="form-control tblDiscInput" onchange="OnPriceChange(this.id);" required /></td>
 					
-					<td><input type="number" id="item_disc_1" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/></td>
+					<td><input type="number" id="item_disc_1" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/>
+					<input type="hidden" id="hdnitem_disc_1" name="itemdisc" value="0">
+					</td>
 					<td>
 						<select name="gst" id="item_gst_1" name="gst" class="form-control tblGSTselect" onchange="OnGSTChange(this.id)">
-							<option selected>Select GST</option>
+							<option value="0" selected>Select GST</option>
 							<option value="5" >5%</option>
 							<option value="12" >12%</option>
-							<option value="16" >16%</option>
-							<option value="20" >20%</option>
+							<option value="14" >14%</option>
+							<option value="28" >28%</option>
 						</select>
+						<input type="hidden" id="item_tax_1" name="itemtax" value="0">
 					</td>
 					<td align="right">
 						&#8377;&nbsp;<label for="itemtotal"  id="lbl_item_total_1">0</label>	
@@ -156,14 +164,18 @@
 					</tr>
 					<tr>
 						<td><label>CGST:</label></td>
-						<td style="text-align:right;">&#8377;&nbsp;<label id="ctaxtotal">0</label></td>
+						<td style="text-align:right;">&#8377;&nbsp;<label id="ctaxtotal">0</label>
+						<input type="hidden" name="cgst" value="0">
+						</td>
 					</tr>
 					<tr>
 						<td><label>SGST:</label></td>
-						<td style="text-align:right;">&#8377;&nbsp;<label id="staxtotal">0</label></td>
+						<td style="text-align:right;">&#8377;&nbsp;<label id="staxtotal">0</label>
+						<input type="hidden" name="sgst" value="0">
+						</td>
 					</tr>
 					<tr>
-						<td><label>IGST:</label></td>
+						<td><label>Total Tax:</label></td>
 						<td style="text-align:right;">
 						&#8377;&nbsp;<label id="taxtotal">0</label>
 						<input type="hidden" name="taxtotal" value="0">
@@ -225,12 +237,13 @@ $("#addrow").click(function(){
 			+'</select>'+
 			'<input type="hidden" name="hdnitemname" id="hdn_item_name_'+newid+ '" ></td>'+
 			'<td><input type="text" id="item_hsn_'+newid+'" name="hsn" placeholder="HSN" class="form-control tblinput"/></td>'+			
-			'<td><input type="text" id="item_unit_'+newid+'" name="unit" placeholder="Unit" class="form-control tblinput"/></td>'+
+			'<td><input type="text" id="item_unit_'+newid+'" name="unit" placeholder="Unit" class="form-control tblinput" value="sqft"/></td>'+
 			'<td><input type="number" id="item_qty_'+newid+'" name="qty" placeholder="Qty" class="form-control tblinput" onchange="OnQtyChange(this.id)"/></td>'+
 			'<td><input type="number" id="item_price_'+newid+'" name="price" placeholder="Price" class="form-control tblDiscInput" required="required" onchange="OnPriceChange(this.id)"/></td>'+
 			
-			'<td><input type="number" id="item_disc_'+newid+'" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/></td>'+
-			'<td><select id="item_gst_'+newid+'" name="gst" class="form-control tblGSTselect" onchange="OnGSTChange(this.id)"><option selected>Select GST</option><option value="5" >5%</option><option value="12" >12%</option><option value="16" >16%</option><option value="20" >20%</option></select></td>'+
+			'<td><input type="number" id="item_disc_'+newid+'" name="disc" placeholder="Disc.%" class="form-control tblDiscInput" onchange="OnDiscChange(this.id)"/>'+'<input type="hidden" id="hdnitem_disc_"'+newid+' name="itemdisc" value="0"></td>'+
+			'<td><select id="item_gst_'+newid+'" name="gst" class="form-control tblGSTselect" onchange="OnGSTChange(this.id)"><option value="0" selected>Select GST</option><option value="5" >5%</option><option value="12" >12%</option><option value="14" >14%</option><option value="28" >28%</option></select>'
+			+'<input type="hidden" id="item_tax_'+newid+'" name="itemtax" value="0"></td>'+
 			'<td align="right">&#8377;&nbsp;<label for="itemtotal" id="lbl_item_total_'+newid+'">0</label><input  type="hidden" id="item_total_'+newid+'" name="itemtotal" value="0"></td>');
 	}
  });
@@ -289,7 +302,7 @@ function OnClientChange(){
 	$("input[name=clientname]").val(selectedClient);
 }
 function OnPriceChange(data){	
-	currentId = getCurrentId(data);
+	currentId = getCurrentId(data);	
 	if(currentId > 0){
 		update_item_total();
 		update_total();
@@ -311,16 +324,16 @@ function OnDiscChange(data){
 		alert("it's not percentage");
 		
 	}else{
-		if(currentId > 0){
+		
 			update_item_total();
 			update_total();
-		}
+		
 	}
 }
 
 function OnGSTChange(data){
 	currentId = getCurrentId(data);
-	if(currentId > 0){
+	if(currentId > 0){		
 		update_item_total();
 		update_total();
 	}
@@ -337,10 +350,9 @@ function update_item_total(){
 		price = (price * qty); 
 	}
 	
-	var discamount,afterdiscamount,addtaxinprice,tax;
+	var discamount=0,afterdiscamount=0,addtaxinprice=0,tax=0;
 	if(disc > 0 && disc <= 100){
-		discamount = ((price * disc) / 100);
-		totaldiscount += discamount;
+		discamount = ((price * disc) / 100);		
 		afterdiscamount = (price - discamount);
 	}else{
 		afterdiscamount = price; 
@@ -348,21 +360,34 @@ function update_item_total(){
 	
 	if (gst > 0) {
 		tax = (afterdiscamount * gst / 100);
-		totaltax +=tax;
+		
 		addtaxinprice = (afterdiscamount + tax); 
 	}else{
 		addtaxinprice = afterdiscamount;
 	}
-	if(!isNaN(addtaxinprice)){
-		$(crtrlItemtId + currentId).text(roundNumber(addtaxinprice,2));
-		$("#item_total_"+currentId).val(roundNumber(addtaxinprice,2)); 
+	if(!isNaN(addtaxinprice) && !isNaN(tax) && !isNaN(discamount)){
+		var roudofftax = roundNumber(addtaxinprice,2);
+		$(crtrlItemtId + currentId).text(roudofftax);
+		$("#item_total_"+currentId).val(roudofftax);
+		
+		$("#hdnitem_disc_"+currentId).val(discamount);
+		$("#item_tax_"+currentId).val(tax); 
 	}
 }
 function update_total(){
-	var total = 0;
+	var total = 0, ltaxtotal = 0, ldisctotal = 0;
 	$("#itemlist > tbody > tr").each(function(){
+		debugger;
 		total += parseInt($(this).closest('tr').find("label[for=itemtotal]").text());
+		/*tax total*/
+		ltaxtotal += parseInt($(this).closest('tr').find("input[name=itemtax]").val());
+		/*discount total*/
+		ldisctotal += parseInt($(this).closest('tr').find("input[name=itemdisc]").val());
 	})
+	
+	totaltax = ltaxtotal;
+	totaldiscount = ldisctotal;
+		
 	if(!isNaN(total)){
 		$("#total").text(roundNumber(total,2));
 		$("input[name=total]").val(roundNumber(total,2));
@@ -383,7 +408,16 @@ function update_subtotal(){
 		$("#taxtotal").text(roundNumber(totaltax,2));
 		$("input[name=taxtotal]").val(roundNumber(totaltax,2));
 	}
-	if(!isNaN(totaldiscount) && totaldiscount!=0){
+	/*update cgst and sgst */
+	if(!isNaN(totaltax) && totaltax!=0){
+		var cstax = roundNumber(totaltax/2,2);
+		$("#ctaxtotal").text(cstax);
+		$("#staxtotal").text(cstax);
+		$("input[name=cgst]").val(cstax);
+		$("input[name=sgst]").val(cstax);
+	}
+	
+	if(!isNaN(totaldiscount)){
 		$("#disctotal").text(roundNumber(totaldiscount,2));
 		$("input[name=disctotal]").val(roundNumber(totaldiscount,2));
 	}

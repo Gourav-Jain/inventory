@@ -3,7 +3,6 @@ from .models import Clients
 from django.http import JsonResponse
 from InventoryManagement.models import Products, Invoices, InvoiceProducts, Clients
 from .forms import InvoiceForm, ClientsForm, ProductsForm
-from _operator import inv
 
 # Create your views here.
 def index(request):
@@ -16,7 +15,7 @@ def invoice(request):
     elif(request.method == "GET"):
         invoiceno = Invoices.objects.all().order_by("-id")[0]
         newnum = invoiceno.id + 1
-        all_clients = Clients.objects.values("id","name")
+        all_clients = Clients.objects.values("id","name", "billing_address")
         all_products = Products.objects.values("id","name", "price")
         return render(request, 'template/invoice.html', {'clients':all_clients, 'products': all_products, 'innumber':newnum})
     else:
@@ -25,6 +24,7 @@ def invoice(request):
 
 def invoicepreview(request):
     tabledata = []
+    maxtax = 0
     data = request.POST
     if(request.method == "POST"):
         invform = InvoiceForm(request.POST)
@@ -41,8 +41,14 @@ def invoicepreview(request):
             invform.taxtotal = invform.cleaned_data["taxtotal"]
             invform.disctotal = invform.cleaned_data["disctotal"]
             invform.total = invform.cleaned_data["total"]
+            invform.ctaxtotal = request.POST.getlist("cgst")
+            invform.staxtotal = request.POST.getlist("sgst")
             
-            oInvoice = Invoices()
+            try:
+                oInvoice = Invoices.objects.get(number=invform.invoiceno)
+            except Invoices.DoesNotExist:
+                oInvoice = Invoices()
+                
             oInvoice.number = invform.invoiceno
             oInvoice.due_date = invform.duedate
             oInvoice.issue_date = invform.invoicedate
@@ -67,8 +73,14 @@ def invoicepreview(request):
             invform.gst = request.POST.getlist("gst")
             invform.itemtotal = request.POST.getlist("itemtotal")
             
+            maxtax = round(int(max(invform.gst)) /2) 
+            
             for idx, val in enumerate(invform.itemid):
-                oInvProd = InvoiceProducts()
+                try:
+                    oInvProd = InvoiceProducts.objects.get(invoice_id=invform.invoiceno, product_id=val)
+                except InvoiceProducts.DoesNotExist:
+                    oInvProd = InvoiceProducts()
+                    
                 oInvProd.product_id = val
                 oInvProd.invoice_id = invform.invoiceno
                 oInvProd.name = invform.itemname[idx]
@@ -82,10 +94,10 @@ def invoicepreview(request):
                 tabledata.append(oInvProd)
                 oInvProd.save()
             
-            #return render_to_response('template/invoicepreview.html')
+            return render_to_response("template/invoicepreview.html", {"form":data, "tbl":tabledata, "tax":maxtax})
         else:
             print("")    
-    return render(request, "template/invoicepreview.html", {"form":data, "tbl":tabledata})
+    return render(request, "template/invoicepreview.html")
 
 def get_item_details(request):
     itemid = request.GET.get('itemid', None)
@@ -102,16 +114,16 @@ def clients(request):
         if(oformClient.is_valid()):
             oformClient.clientname = oformClient.cleaned_data["clientname"]
             oformClient.billto = oformClient.cleaned_data["billto"]
-            oformClient.shipto = oformClient.cleaned_data["shipto"]
+            #oformClient.shipto = oformClient.cleaned_data["shipto"]
             oformClient.contactnum = oformClient.cleaned_data["contactnum"]
-            oformClient.issame = oformClient.cleaned_data["issame"]
+            #oformClient.issame = oformClient.cleaned_data["issame"]
             oformClient.email = oformClient.cleaned_data["email"]
             
             
             oClient = Clients()
             oClient.name = oformClient.clientname
             oClient.billing_address = oformClient.billto
-            oClient.shipping_address = oformClient.shipto
+            #oClient.shipping_address = oformClient.shipto
             oClient.contact = oformClient.contactnum
             oClient.email = oformClient.email
             oClient.save()
@@ -128,7 +140,7 @@ def products(request):
             oformProd.productname = oformProd.cleaned_data["productname"]
             oformProd.tax = oformProd.cleaned_data["tax"]
             oformProd.unit = oformProd.cleaned_data["unit"]
-            oformProd.hsn = oformProd.cleaned_data["hsnnumber"]
+            oformProd.hsn = oformProd.cleaned_data["hsn"]
             oformProd.price = oformProd.cleaned_data["price"]
             
             oProd = Products()
@@ -136,7 +148,8 @@ def products(request):
             oProd.measuring_unit = oformProd.unit
             oProd.hsn = oformProd.hsn
             oProd.tax_id = oformProd.tax
-            oProd.price = oformProd.price            
+            oProd.price = oformProd.price
+            oProd.has_tax_included = True           
             oProd.save();
             
         else:

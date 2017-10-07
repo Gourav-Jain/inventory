@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Invoice</title>
+		<title>Tax Invoice</title>
 		<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
 		
 		<style type="text/css">
@@ -114,19 +114,19 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 	</head>
 	<body>
 		<header>
-			<h1>Invoice</h1>
+			<h1>Tax Invoice</h1>
 			<address >
-				<p>Jonathan Neal</p>
-				<p>101 E. Chapman Ave<br>Orange, CA 92866</p>
-				<p>(800) 555-1234</p>
-				<p><label>GSTIN:</label></p>
+				<p>WARJE GLASS HOUSE</p>
+				<p>Shop No.8,9,10 Popular Prestige<br>Warje Chowk, Warje Gaon Road</p>
+				<p>Pune-411058</p>
+				<p><label>GSTIN: 27ACEPS8662C1ZD</label></p>
 			</address>
-			<span><img alt="" src="http://www.jonathantneal.com/examples/invoice/logo.png"></span>
+			<span><img alt="" src=""></span>
 		</header>
 		<article>
 			<h1>Recipient</h1>
 			<address >
-				<p>{{form.clientname}}</p>
+				<p style="font-size: 15px;">{{form.clientname}}</p>
 			</address>
 			<table class="meta">
 				<tr>
@@ -174,7 +174,15 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 			
 			<table class="balance">
 				<tr>
-					<th><span >Total Tax Amount</span></th>
+					<th><span >CGST {{ tax }} %</span></th>
+					<td><span data-prefix>&#8377;</span><span>{{form.cgst}}</span></td>
+				</tr>
+				<tr>
+					<th><span >SGST {{ tax }} % </span></th>
+					<td><span data-prefix>&#8377;</span><span>{{form.sgst}}</span></td>
+				</tr>
+				<tr>
+					<th><span >Total Tax</span></th>
 					<td><span data-prefix>&#8377;</span><span>{{form.taxtotal}}</span></td>
 				</tr>
 				<tr>
@@ -188,9 +196,14 @@ aside h1 { border-color: #999; border-bottom-style: solid; }
 			</table>
 		</article>
 		<aside>
-			<h1><span >Additional Notes</span></h1>
+			<h1><span >Terms &amp; Conditions</span></h1>
 			<div >
-				<p>A finance charge of 1.5% will be made on unpaid balances after 30 days.</p>
+				<ol type="1">
+					<li>Material is cut &amp; Delivered as per your approved sample. </li>
+					<li>Goods once sold shall not be taken back.</li>
+					<li>Interest will be charged at 2% per month if this bill not paid.</li>
+					<li>Our responsibility cease as soon leave our premises.</li>
+				</ol>
 			</div>
 		</aside>
 	</body>

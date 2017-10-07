@@ -19,7 +19,7 @@
 				</tr>
 				<tr>
 					<td><label>HSN Number</label> </td>
-					<td><input type="text" class="form-control" name="hsnnumber" placeholder="HSN number"></input> </td>
+					<td><input type="text" class="form-control" name="hsn" placeholder="HSN number"></input> </td>
 				</tr>
 				<tr>
 					<td><label>Price</label> </td>
@@ -28,18 +28,18 @@
 				<tr>
 					<td><label>Tax (In GST)</label> </td>
 					<td>
-						<select name="tax" id="item_gst_1" name="gst" class="form-control tblGSTselect" required="required">
-							<option selected>Select GST</option>
-							<option value="5" >5%</option>
-							<option value="12" >12%</option>
-							<option value="16" >16%</option>
-							<option value="20" >20%</option>
+						<select name="tax" id="taxgst" class="form-control tblGSTselect" required="required">
+							<option value="" selected>Select GST</option>
+							<option value="5">5%</option>
+							<option value="12">12%</option>
+							<option value="14">14%</option>
+							<option value="28">28%</option>
 						</select>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
-					<td><input class="btn btn-success btn-action" type="submit"  value="Add Client"> </td>
+					<td><input class="btn btn-success btn-action" type="submit"  value="Add Product"> </td>
 				</tr>
 			</table>
 			</form>

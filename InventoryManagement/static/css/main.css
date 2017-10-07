@@ -2,7 +2,7 @@ body{
 	color: #66615b;
     font-size: 14px;
     font-family: 'Muli', Arial, sans-serif !important;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 h1.page-header {
     margin-top: -5px;
